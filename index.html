@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visa Services</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f6f7fb; color: #111; }
+    .wrap { max-width: 640px; margin: 40px auto; padding: 0 16px; }
+    .card { background: #fff; border: 1px solid #e6e8ef; border-radius: 12px; padding: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.05); }
+    h1 { margin: 0 0 10px; font-size: 24px; }
+    p { margin: 0 0 16px; color: #444; line-height: 1.5; }
+    label { display: block; margin: 12px 0 6px; font-weight: 600; }
+    input, select {
+      width: 100%; box-sizing: border-box;
+      padding: 10px 12px; border: 1px solid #ccd2e0; border-radius: 10px;
+      font-size: 14px; outline: none;
+    }
+    .btn {
+      margin-top: 14px; width: 100%;
+      background: #111; color: #fff; border: 0;
+      padding: 12px 14px; border-radius: 10px; cursor: pointer;
+      font-weight: 700; font-size: 15px;
+    }
+    .check { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+    .check input { width: auto; }
+    .small { font-size: 12px; color: #666; margin-top: 10px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Visa Help</h1>
+      <p>Fill this form. It logs your details and opens WhatsApp with a ready message.</p>
+
+      <form id="leadForm">
+        <!-- honeypot -->
+        <input type="hidden" name="_hp" value="">
+
+        <label>Name</label>
+        <input name="name" required placeholder="Your full name" />
+
+        <label>Email</label>
+        <input name="email" type="email" required placeholder="you@email.com" />
+
+        <label>Phone (WhatsApp)</label>
+        <input name="phone" required placeholder="+91..." />
+
+        <label>Visa type</label>
+        <select name="visaType" required>
+          <option value="">Select</option>
+          <option>US F-1</option>
+          <option>US B1/B2</option>
+          <option>Schengen Tourist</option>
+          <option>Canada Study Permit</option>
+          <option>Australia Student (500)</option>
+          <option>Germany Student</option>
+          <option>UAE Tourist</option>
+          <option>Turkey e-Visa</option>
+        </select>
+
+        <label>Urgency</label>
+        <select name="urgency" required>
+          <option value="">Select</option>
+          <option>&lt; 7 days</option>
+          <option>1–3 weeks</option>
+          <option>&gt; 3 weeks</option>
+        </select>
+
+        <div class="check">
+          <input id="consent" type="checkbox" required />
+          <label for="consent" style="margin:0; font-weight:600;">
+            I consent to be contacted on WhatsApp.
+          </label>
+        </div>
+
+        <button class="btn" type="submit">Continue on WhatsApp</button>
+
+        <div class="small">
+          Don’t upload documents here. You’ll receive an upload link after payment.
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymfym_FA7oLR-HrpnwFGm3zCmYAtk-NE0kHmdyKAgcRkOgX7YtgVwckpBNtyC4ei0G/exec";
+  const YOUR_WA_NUMBER  = "918329318571";
+
+  function buildWhatsAppMessage(d) {
+    return `Hi! I submitted your website form. 👋
+
+Name: ${d.name}
+Visa: ${d.visaType}
+Urgency: ${d.urgency}
+
+Please share the fee and next steps.`;
+  }
+
+  document.getElementById("leadForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const fd = new FormData(document.getElementById("leadForm"));
+    const data = Object.fromEntries(fd.entries());
+
+    // Log to sheet (fire-and-forget)
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(data)
+    });
+
+    // Open WhatsApp
+    const waUrl = `https://wa.me/${YOUR_WA_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage(data))}`;
+    window.open(waUrl, "_blank");
+  });
+</script>
+
+</body>
+</html>
